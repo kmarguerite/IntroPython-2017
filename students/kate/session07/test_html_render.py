@@ -5,7 +5,7 @@ test html render activity
 
 import html_render
 import pytest
-from html_render import Element, Body, Para, HTML
+from html_render import Element, Body, Para, HTML, Head, OneLineTag, Title
 
 def test_new_element():
     el_object = html_render.Element()
@@ -25,11 +25,11 @@ def test_adding_empty_string():
 def test_append_string():
     el_object = html_render.Element('Hedgie')
     el_object.append(' Hugs!')
-    assert el_object.content == ['Hedgie Hugs!']
+    assert el_object.content == ['Hedgie',' Hugs!']
 
 def test_tag_exists():
     assert html_render.Element.tag == 'html'
-    el_object = html_render.Element.tag('spam, spam, spam')
+    el_object = html_render.Element('spam, spam, spam')
     assert el_object.tag == 'html'
 
 def test_indent_exists():
@@ -42,7 +42,20 @@ def test_para_tag():
     assert Para.tag == 'p'
 
 def test_html_tag():
-    assert HTML.tag == 'HTML'
+    assert HTML.tag == 'html'
 
-def test_render_non_strings():
-    el_object - Element(Body('a neat string'))
+def test_head_tag():
+    assert Head.tag == 'head'
+
+def test_render():
+        hedgie_string = "Hedgehogs rule!"
+        more_hedgie = "Helena is the cutest!"
+        el_object = Element(hedgie_string)
+        el_object.append(more_hedgie)
+        with open('test1', 'w') as out_file:
+            el_object.render(out_file)
+        with open('test1', 'r') as in_file:
+            contents = in_file.read()
+        assert contents.endswith('</html>')
+        assert hedgie_string in contents
+        assert more_hedgie in contents

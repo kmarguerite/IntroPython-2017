@@ -19,7 +19,18 @@ class Element():
         self.content.append(content)
 
     def render(self, file_obj):
-        file_obj.write('<')
+        all_content = ('<' + self.tag + '>')
+        for each in self.content:
+            try:
+                all_content += each
+            except TypeError:
+                each.render(file_obj)
+        all_content += '</' + self.tag + '>'
+
+        self.write_to_file(file_obj, all_content)
+
+    def write_to_file(self, file_obj, stuff_to_print):
+        file_obj.write(stuff_to_print)
 
 class Body(Element):
     tag = 'body'
@@ -27,5 +38,22 @@ class Body(Element):
 class Para(Element):
     tag = 'p'
 
-class HTML(Element):
-    tag = 'HTML'
+class Html(Element):
+    tag = 'html'
+
+class Head(Element):
+    tag = 'head'
+
+class OneLineTag(Element):
+
+    def render(self, out_file, ind=""):
+        out_file.write('\n' + ind + '<' + self.tag + '>')
+        for each in self.content:
+            try:
+                each.render(out_file)
+            except AttributeError:
+                out_file.write(str(each))
+        out_file.write('</' + self.tag + '>')
+
+class Title(OneLineTag):
+    tag = 'title'
