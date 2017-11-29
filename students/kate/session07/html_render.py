@@ -4,10 +4,12 @@ html render activity
 """
 
 class Element():
+    """ Class for rendering html element
+    # """
     tag = 'html'
     indent = '  '
 
-    def __init__(self, content=None):
+    def __init__(self, content=None, **kwargs):
         if content is None:
             self.content = []
         else:
@@ -18,7 +20,8 @@ class Element():
     def append(self, content):
         self.content.append(content)
 
-    def render(self, file_obj):
+    def render(self, file_obj, cur_ind=""):
+        
         all_content = ('<' + self.tag + '>')
         for each in self.content:
             try:
@@ -32,6 +35,41 @@ class Element():
     def write_to_file(self, file_obj, stuff_to_print):
         file_obj.write(stuff_to_print)
 
+class OneLineTag(Element):
+
+    def render(self, out_file, ind=""):
+        out_file.write('\n' + ind + '<' + self.tag + '>')
+        for each in self.content:
+            try:
+                each.render(out_file)
+            except AttributeError:
+                out_file.write(str(each))
+        out_file.write('</' + self.tag + '>')
+
+
+class SelfClosingTag(Element):
+
+    def render(self, out_file, ind = "", depth=1):
+        out_file.write("{}<{} />\n".format(ind*depth, self.tag))
+
+class A(Element):
+    def __init__(self,link, text):
+        super(A, self).__init__()
+        self.link = link
+        self.text = text
+
+    def render(self, out_file, ind="", depth=1):
+        out_file.write('{}<a href="{}">{}</a>\n'.format(ind*depth, self.link, self.text))
+
+class Hr(SelfClosingTag):
+    tag = 'hr'
+
+class Br(SelfClosingTag):
+    tag = 'br'
+
+class Title(OneLineTag):
+    tag = 'title'
+
 class Body(Element):
     tag = 'body'
 
@@ -44,16 +82,8 @@ class Html(Element):
 class Head(Element):
     tag = 'head'
 
-class OneLineTag(Element):
+class Ul(Element):
+    tag = "ul"
 
-    def render(self, out_file, ind=""):
-        out_file.write('\n' + ind + '<' + self.tag + '>')
-        for each in self.content:
-            try:
-                each.render(out_file)
-            except AttributeError:
-                out_file.write(str(each))
-        out_file.write('</' + self.tag + '>')
-
-class Title(OneLineTag):
-    tag = 'title'
+class Li(Element):
+    tag = "li"
